@@ -11,3 +11,5 @@ wheels/
 
 # Dev folder
 dev/
+.aider*
+.env
