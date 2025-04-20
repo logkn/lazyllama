@@ -40,6 +40,29 @@ class BaseConfig(BaseModel):
     @classmethod
     def load(cls) -> Self | None:
         return cls._from_yaml(cls.path())
+        
+    def save(self, path: str | Path) -> None:
+        if isinstance(path, str):
+            path = Path(path)
+            
+        # Create parent directory if it doesn't exist
+        path.parent.mkdir(parents=True, exist_ok=True)
+        
+        import yaml
+        from enum import Enum
+        
+        # Add a custom representer for enum values
+        def enum_representer(dumper, data):
+            return dumper.represent_scalar('tag:yaml.org,2002:str', str(data.value))
+        
+        # Register enum representer
+        yaml.SafeDumper.add_representer(Backend, enum_representer)
+        
+        # Convert model to dict and handle enum values
+        data = self.model_dump()
+        
+        with open(path, "w") as f:
+            yaml.safe_dump(data, f)
 
     @staticmethod
     @abstractmethod

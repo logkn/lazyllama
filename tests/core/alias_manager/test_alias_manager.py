@@ -11,28 +11,24 @@ def alias_manager():
 
 @pytest.fixture
 def sample_alias():
+    from src.core.models.alias import AliasModel
     return Alias(
         name="test-alias",
-        model=Alias(
-            name="test-alias-model",
-            backend=Backend.LLAMACPP,
-            path="/path/to/model",
-            temperature=0.7,
-            max_tokens=1024
+        model=AliasModel(
+            model_name="test-alias-model",
+            backend=Backend.LLAMACPP
         )
     )
 
 
 @pytest.fixture
 def different_config_alias():
+    from src.core.models.alias import AliasModel
     return Alias(
         name="test-alias",
-        model=Alias(
-            name="test-alias-model",
-            backend=Backend.OPENAI,
-            path=None,
-            temperature=0.7,
-            max_tokens=1024
+        model=AliasModel(
+            model_name="test-alias-model",
+            backend=Backend.OLLAMA
         )
     )
 
@@ -54,28 +50,44 @@ def test_add_alias_same_name_different_config(
 
 
 def test_load_starting_aliases(alias_manager, tmp_path, sample_alias):
+    import os
+    import sys
+    from unittest.mock import patch
+    
     # Create temporary config files
     global_config = GlobalConfig()
     project_config = ProjectConfig()
     
     # Add sample alias to both configs
     global_config.aliases["global-alias"] = AliasConfig(
-        model_name="llama2"
+        model_name="llama2",
+        backend=Backend.LLAMACPP
     )
     project_config.aliases["project-alias"] = AliasConfig(
-        model_name="gpt4"
+        model_name="gpt4", 
+        backend=Backend.OLLAMA
     )
     
     # Save configs to temporary files
-    global_config_path = tmp_path / GlobalConfig.path()
-    project_config_path = tmp_path / ProjectConfig.path()
+    global_config_path = tmp_path / "global_config.yaml"
+    project_config_path = tmp_path / "project_config.yaml"
     
     global_config.save(global_config_path)
     project_config.save(project_config_path)
     
-    # Reset alias manager and reload aliases
+    # Patch the path methods to use our temporary files
+    def mock_global_path():
+        return global_config_path
+        
+    def mock_project_path():
+        return project_config_path
+    
+    # Reset alias manager and reload aliases with patched config paths
     alias_manager._aliases.clear()
-    alias_manager._load_starting_aliases()
+    
+    with patch.object(GlobalConfig, 'path', mock_global_path):
+        with patch.object(ProjectConfig, 'path', mock_project_path):
+            alias_manager._load_starting_aliases()
     
     assert "global-alias" in alias_manager._aliases
     assert "project-alias" in alias_manager._aliases
