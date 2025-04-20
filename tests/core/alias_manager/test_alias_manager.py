@@ -1,6 +1,6 @@
 import pytest
 from src.core.models.alias import Alias, Backend
-from src.core.config.config import GlobalConfig, ProjectConfig
+from src.core.config.config import GlobalConfig, ProjectConfig, AliasConfig
 from src.core.alias_manager import AliasManager, AliasAlreadyExistsError
 
 
