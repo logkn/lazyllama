@@ -14,9 +14,11 @@ def sample_alias():
     return Alias(
         name="test-alias",
         model=Alias(
-            name="llama2",
+            name="test-alias-model",
             backend=Backend.LLAMACPP,
-            path="/path/to/model"
+            path="/path/to/model",
+            temperature=0.7,
+            max_tokens=1024
         )
     )
 
@@ -26,9 +28,11 @@ def different_config_alias():
     return Alias(
         name="test-alias",
         model=Alias(
-            name="gpt4",
+            name="test-alias-model",
             backend=Backend.OPENAI,
-            path=None
+            path=None,
+            temperature=0.7,
+            max_tokens=1024
         )
     )
 
