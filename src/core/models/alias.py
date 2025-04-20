@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 
 class Backend(StrEnum):
-    llama_cpp = auto()
-    ollama = auto()
+    LLAMACPP = auto()
+    OLLAMA = auto()
 
 
 class AliasModel(BaseModel):

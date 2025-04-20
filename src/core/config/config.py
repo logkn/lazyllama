@@ -1,14 +1,17 @@
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 from pathlib import Path
 from typing import Any, Self, override
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.constants import GLOBAL_CONFIG_PATH
 from src.core.models.alias import Alias, AliasModel, Backend
 
 
-class BaseConfig(BaseModel, meta=ABCMeta):
-    aliases: dict[str, "AliasConfig"] = {}
+class BaseConfig(BaseModel):
+    aliases: dict[str, "AliasConfig"] = Field(
+        default_factory=dict,
+        description="A dictionary of aliases, where the key is the alias name and the value is an AliasConfig object.",
+    )
 
     def _get_aliases(self) -> list[Alias]:
         return [alias.to_alias(name) for name, alias in self.aliases.items()]
