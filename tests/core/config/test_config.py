@@ -111,12 +111,24 @@ def test_base_config_get_aliases_no_config() -> None:
 
     assert len(aliases) == 0
 
-def test_add_duplicate_alias_different_config(alias_manager: AliasManager, alias: Alias):
+
+def test_add_duplicate_alias_different_config(
+    alias_manager: AliasManager, alias: Alias
+):
     """Test adding duplicate alias with different configuration"""
     alias_manager.add_alias(alias)
     with pytest.raises(AliasAlreadyExistsError) as e:
-        alias_manager.add_alias(Alias(name=alias.name, model=AliasModel(model_name="different_model", backend=Backend.LLAMACPP)))
-    
-    assert f"Alias '{alias.name}' already exists with different configuration:" in str(e.value)
+        alias_manager.add_alias(
+            Alias(
+                name=alias.name,
+                model=AliasModel(
+                    model_name="different_model", backend=Backend.LLAMACPP
+                ),
+            )
+        )
+
+    assert f"Alias '{alias.name}' already exists with different configuration:" in str(
+        e.value
+    )
     assert "Existing alias" in str(e.value)
     assert "New alias" in str(e.value)
