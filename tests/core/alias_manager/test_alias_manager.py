@@ -15,7 +15,7 @@ def sample_alias():
         name="test-alias",
         model=Alias(
             name="llama2",
-            backend=Backend.LlamaCpp,
+            backend=Backend.LLAMACPP,
             path="/path/to/model"
         )
     )
@@ -27,7 +27,7 @@ def different_config_alias():
         name="test-alias",
         model=Alias(
             name="gpt4",
-            backend=Backend.OpenAI,
+            backend=Backend.OPENAI,
             path=None
         )
     )
