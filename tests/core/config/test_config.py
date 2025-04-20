@@ -4,6 +4,8 @@ from typing import Any, Dict
 from unittest.mock import patch
 
 from src.core.models.alias import Alias, Backend
+from src.core.models.alias import Alias, Backend, AliasModel
+from src.core.alias_manager import AliasManager, AliasAlreadyExistsError
 from src.core.config.config import (
     BaseConfig,
     GlobalConfig,
@@ -109,7 +111,7 @@ def test_base_config_get_aliases_no_config() -> None:
 
     assert len(aliases) == 0
 
-def test_add_duplicate_alias_different_config(self, alias_manager: AliasManager, alias: Alias):
+def test_add_duplicate_alias_different_config(alias_manager: AliasManager, alias: Alias):
     """Test adding duplicate alias with different configuration"""
     alias_manager.add_alias(alias)
     with pytest.raises(AliasAlreadyExistsError) as e:
