@@ -7,8 +7,10 @@ class AliasAlreadyExistsError(Exception):
         message = (
             f"Alias '{new_alias.name}' already exists with different configuration:\n"
         )
-        message += f"Existing alias ({existing_alias.backend}): {existing_alias}\n"
-        message += f"New alias ({new_alias.backend}): {new_alias}"
+        message += (
+            f"Existing alias ({existing_alias.model.backend}): {existing_alias}\n"
+        )
+        message += f"New alias ({new_alias.model.backend}): {new_alias}"
         super().__init__(message)
 
 

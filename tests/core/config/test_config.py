@@ -1,13 +1,11 @@
 import pytest
 from pathlib import Path
-from typing import Any, Dict
 from unittest.mock import patch
 
 from src.core.models.alias import Alias, Backend
-from src.core.models.alias import Alias, Backend, AliasModel
+from src.core.models.alias import AliasModel
 from src.core.alias_manager import AliasManager, AliasAlreadyExistsError
 from src.core.config.config import (
-    BaseConfig,
     GlobalConfig,
     ProjectConfig,
     AliasConfig,
@@ -39,6 +37,23 @@ def temp_yaml_file(tmp_path: Path) -> Path:
             else:
                 f.write(f"{key}: {value}\n")
     return temp_file
+
+
+@pytest.fixture
+def alias_manager() -> AliasManager:
+    """Create an instance of AliasManager"""
+    return AliasManager()
+
+
+@pytest.fixture
+def alias() -> Alias:
+    """Create a sample alias"""
+    return Alias(
+        name="test-alias",
+        model=AliasModel(model_name="mixtral-8x7b-32768", backend=Backend.LLAMACPP),
+        n_ctx=4096,
+        command_params=["--param1", "--param2"],
+    )
 
 
 def test_global_config_load(temp_yaml_file: Path) -> None:

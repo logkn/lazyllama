@@ -16,4 +16,4 @@ class Alias(BaseModel):
     name: str
     model: AliasModel
     n_ctx: int = 4096
-    command_params: list[str]
+    command_params: list[str] = []
