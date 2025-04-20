@@ -5,10 +5,10 @@ from src.core.config.config import GlobalConfig, ProjectConfig
 class AliasAlreadyExistsError(Exception):
     def __init__(self, new_alias: Alias, existing_alias: Alias):
         message = (
-            f"Alias '{new_alias.name}' already exists with different configuration."
+            f"Alias '{new_alias.name}' already exists with different configuration:\n"
         )
-        message += f"\nExisting alias: {existing_alias}"
-        message += f"\nNew alias: {new_alias}"
+        message += f"Existing alias ({existing_alias.backend}): {existing_alias}\n"
+        message += f"New alias ({new_alias.backend}): {new_alias}"
         super().__init__(message)
 
 

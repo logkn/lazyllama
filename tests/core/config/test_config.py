@@ -93,10 +93,10 @@ def test_alias_config_to_alias() -> None:
     assert alias.command_params == ["--param1", "--param2"]
 
 
-def test_base_config_get_aliases(temp_yaml_file: Path) -> None:
-    """Test getting aliases from config"""
+def test_project_config_get_aliases(temp_yaml_file: Path) -> None:
+    """Test getting aliases from project config"""
     with patch("src.core.config.config.Path.cwd", return_value=temp_yaml_file.parent):
-        aliases = BaseConfig.get_aliases()
+        aliases = ProjectConfig.get_aliases()
 
     assert len(aliases) == 1
     assert isinstance(aliases[0], Alias)
@@ -105,6 +105,16 @@ def test_base_config_get_aliases(temp_yaml_file: Path) -> None:
 def test_base_config_get_aliases_no_config() -> None:
     """Test getting aliases when no config exists"""
     with patch("src.core.config.config.Path.exists", return_value=False):
-        aliases = BaseConfig.get_aliases()
+        aliases = GlobalConfig.get_aliases()
 
     assert len(aliases) == 0
+
+def test_add_duplicate_alias_different_config(self, alias_manager: AliasManager, alias: Alias):
+    """Test adding duplicate alias with different configuration"""
+    alias_manager.add_alias(alias)
+    with pytest.raises(AliasAlreadyExistsError) as e:
+        alias_manager.add_alias(Alias(name=alias.name, model=AliasModel(model_name="different_model", backend=Backend.LLAMACPP)))
+    
+    assert f"Alias '{alias.name}' already exists with different configuration:" in str(e.value)
+    assert "Existing alias" in str(e.value)
+    assert "New alias" in str(e.value)
