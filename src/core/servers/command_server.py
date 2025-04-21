@@ -1,5 +1,6 @@
 import asyncio
 from abc import ABC, abstractmethod
+from typing import override
 
 from src.core.models.alias import Alias
 
@@ -17,6 +18,7 @@ class CommandServer(BaseServer, ABC):
         """
         ...
 
+    @override
     async def start(self) -> None:
         if self.process is not None and self.process.returncode is None:
             return  # Already running
@@ -28,6 +30,7 @@ class CommandServer(BaseServer, ABC):
             stderr=asyncio.subprocess.DEVNULL,
         )
 
+    @override
     async def stop(self) -> None:
         if self.process and self.process.returncode is None:
             self.process.terminate()
