@@ -13,3 +13,4 @@ wheels/
 dev/
 .aider*
 .env
+.coverage
