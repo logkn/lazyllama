@@ -21,8 +21,10 @@ DEFAULT_PORTS = {
 class ServerManager:
     def __init__(self):
         self.running_servers: list[BaseServer] = []
+        # Cache measured resource models per (backend, model_name, command_params)
+        # command_params is converted to tuple for hashing
         self.resource_models: dict[
-            tuple[Backend, str], tuple[float, float, float, float]
+            tuple[Backend, str, tuple[str, ...]], tuple[float, float, float, float]
         ] = {}
 
         self.total_ram_mb: float = get_total_ram_mb()
@@ -111,7 +113,12 @@ class ServerManager:
     def get_or_measure_resource_model(
         self, alias: Alias
     ) -> tuple[float, float, float, float]:
-        key = (alias.model.backend, alias.model.model_name)
+        # Key the cache by backend, model_name, and command_params
+        key = (
+            alias.model.backend,
+            alias.model.model_name,
+            tuple(alias.command_params),
+        )
         if key in self.resource_models:
             return self.resource_models[key]
         model = self.measure_resource_model(alias)
