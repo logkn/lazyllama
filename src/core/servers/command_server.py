@@ -40,3 +40,7 @@ class CommandServer(BaseServer, ABC):
                 self.process.kill()
                 await self.process.wait()
         self.process = None
+
+    @override
+    async def check_running(self) -> bool:
+        return self.process is not None and self.process.returncode is None

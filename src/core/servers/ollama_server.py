@@ -133,9 +133,3 @@ class OllamaServer(CommandServer):
             self._ollama_pid = None
         self._process = None
         shutil.rmtree(self._modelfile_dir, ignore_errors=True)
-
-    @override
-    async def check_running(self) -> bool:
-        if self._process is None:
-            return False
-        return self._process.returncode is None
