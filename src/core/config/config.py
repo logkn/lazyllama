@@ -49,7 +49,6 @@ class BaseConfig(BaseModel):
         path.parent.mkdir(parents=True, exist_ok=True)
         
         import yaml
-        from enum import Enum
         
         # Add a custom representer for enum values
         def enum_representer(dumper, data):

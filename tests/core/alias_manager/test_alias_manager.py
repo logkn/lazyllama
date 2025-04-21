@@ -50,8 +50,6 @@ def test_add_alias_same_name_different_config(
 
 
 def test_load_starting_aliases(alias_manager, tmp_path, sample_alias):
-    import os
-    import sys
     from unittest.mock import patch
     
     # Create temporary config files
