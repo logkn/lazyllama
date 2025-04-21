@@ -1,11 +1,12 @@
 import asyncio
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 
 from src.core.models.alias import Alias
+
 from .base_server import BaseServer
 
 
-class CommandServer(BaseServer):
+class CommandServer(BaseServer, ABC):
     process: asyncio.subprocess.Process | None = None
 
     @abstractmethod
