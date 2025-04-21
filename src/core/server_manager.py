@@ -10,6 +10,8 @@ from pynvml import (
 
 from src.core.models.alias import Alias, Backend
 from src.core.servers.base_server import BaseServer, ServerStatus
+import json
+from src.constants import RESOURCE_CACHE_PATH
 
 DEFAULT_PORTS = {
     Backend.OLLAMA: 11434,
@@ -26,6 +28,8 @@ class ServerManager:
         self.resource_models: dict[
             tuple[Backend, str, tuple[str, ...]], tuple[float, float, float, float]
         ] = {}
+        # Load persistent resource model cache
+        self._load_resource_cache()
 
         self.total_ram_mb: float = get_total_ram_mb()
         self.total_vram_mb: float = get_total_vram_mb()
@@ -123,10 +127,50 @@ class ServerManager:
             return self.resource_models[key]
         model = self.measure_resource_model(alias)
         self.resource_models[key] = model
+        # Persist updated resource model cache
+        self._persist_resource_cache()
         return model
 
     def measure_resource_model(self, alias: Alias) -> tuple[float, float, float, float]:
         raise NotImplementedError("Resource model measurement not implemented")
+
+    def _load_resource_cache(self) -> None:
+        path = RESOURCE_CACHE_PATH
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            if path.exists():
+                with open(path, "r") as f:
+                    data = json.load(f)
+                for key_str, vals in data.items():
+                    parts = key_str.split("::")
+                    if len(parts) != 3:
+                        continue
+                    backend_str, model_name, params_str = parts
+                    command_params = params_str.split(",") if params_str else []
+                    try:
+                        backend = Backend(backend_str)
+                    except ValueError:
+                        continue
+                    key = (backend, model_name, tuple(command_params))
+                    if isinstance(vals, (list, tuple)) and len(vals) == 4:
+                        self.resource_models[key] = tuple(vals)
+        except Exception:
+            pass
+
+    def _persist_resource_cache(self) -> None:
+        path = RESOURCE_CACHE_PATH
+        path.parent.mkdir(parents=True, exist_ok=True)
+        data: dict[str, list[float]] = {}
+        for key, vals in self.resource_models.items():
+            backend, model_name, command_params = key
+            params_str = ",".join(command_params)
+            key_str = f"{backend.value}::{model_name}::{params_str}"
+            data[key_str] = list(vals)
+        try:
+            with open(path, "w") as f:
+                json.dump(data, f)
+        except Exception:
+            pass
 
     async def evict_servers(
         self, R_deficit: float, V_deficit: float
