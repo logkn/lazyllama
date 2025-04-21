@@ -30,9 +30,11 @@ class EvictableMockServer(BaseServer):
 async def test_server_eviction_under_pressure():
     manager = ServerManager()
 
-    # Patch with tight resource limits
-    manager.total_ram_mb = 400.0
-    manager.total_vram_mb = 800.0
+    # Patch with tight resource limits matching dummy resource model demands
+    # alias_a needs R=100+0.1*3000=400, V=200+0.2*3000=800;
+    # alias_b needs R=100+0.1*3500=450, V=200+0.2*3500=900
+    manager.total_ram_mb = 450.0
+    manager.total_vram_mb = 900.0
 
     # Patch with mocks
     def create_mock_server(self, alias: Alias, port: int) -> BaseServer:
